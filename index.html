@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f4c5c" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>YBÜ İnsülin İnfüzyon KDS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>YBÜ İnsülin İnfüzyon KDS</h1>
+      <p>Erişkin yoğun bakım • IV regular insülin • 1 Ü/mL</p>
+    </div>
+    <div id="offlineBadge" class="badge">Offline hazır</div>
+  </header>
+
+  <main class="layout">
+    <aside class="card sticky">
+      <h2>Güvenlik</h2>
+      <div class="alert danger"><strong>Klinik prototip:</strong> Klinik kullanımdan önce kurum protokolü, eczane, hemşirelik ve hekim ekibi tarafından doğrulanmalıdır.</div>
+      <div class="alert warn">DKA/HHS için kullanılmaz.</div>
+      <div class="alert info"><strong>Hazırlama:</strong> 50 Ü regular insülin + %0,9 NaCl ile toplam 50 mL = 1 Ü/mL. Seti hazırlanan insülin solüsyonu ile doldurun. Setin içinden 20 mL insülin solüsyonu geçirerek yıkayın; bu 20 mL’yi hastaya vermeden atın.</div>
+      <div class="alert info"><strong>Doz değişikliği sonrası:</strong> glukozu 30–60 dk içinde tekrar ölç.</div>
+      <div class="alert danger"><strong>Hipoglisemi:</strong> &lt;70 mg/dL → insülini durdur, IV dekstroz protokolü, 15 dk sonra kontrol.</div>
+    </aside>
+
+    <section class="content">
+      <div class="card">
+        <h2>1. Hasta ve hedef</h2>
+        <div class="grid two">
+          <label>Diyabet
+            <select id="diabetes">
+              <option value="none">Yok / bilinmiyor</option>
+              <option value="t1">Tip 1</option>
+              <option value="t2">Tip 2</option>
+              <option value="other">Diğer</option>
+            </select>
+          </label>
+          <label>HbA1c (%)
+            <input id="hba1c" type="number" step="0.1" min="3" max="20" placeholder="Örn. 8.6" />
+          </label>
+        </div>
+        <div id="hba1cNotice" class="alert hidden"></div>
+        <div class="target-row">
+          <label><input type="radio" name="target" value="standard" checked /> Standart hedef <strong>140–180 mg/dL</strong></label>
+          <label><input type="radio" name="target" value="liberal" /> Liberal hedef <strong>140–200 mg/dL</strong></label>
+        </div>
+        <div id="type1Notice" class="alert danger hidden">Tip 1 diyabette uzamış insülinsiz dönemden kaçının; IV glukoz + insülin gereksinimini hekim yeniden değerlendirmelidir.</div>
+      </div>
+
+      <div class="card">
+        <h2>2. Mevcut durum</h2>
+        <div class="grid three">
+          <label>İnfüzyon durumu
+            <select id="mode">
+              <option value="start">Yeni başlanacak</option>
+              <option value="running">Devam ediyor</option>
+              <option value="held">Geçici durdurulmuş</option>
+            </select>
+          </label>
+          <label>Güncel glukoz (mg/dL)
+            <input id="currentGlucose" type="number" min="20" max="1000" placeholder="Örn. 238" />
+          </label>
+          <label id="currentRateField">Mevcut insülin (Ü/saat)
+            <input id="currentRate" type="number" min="0" max="100" step="0.5" placeholder="Örn. 4" />
+          </label>
+        </div>
+        <div id="startDosePreview" class="alert info hidden"></div>
+
+        <div id="trendInputs" class="grid three hidden">
+          <label>Önceki glukoz (mg/dL)
+            <input id="previousGlucose" type="number" min="20" max="1000" placeholder="Örn. 268" />
+          </label>
+          <label>Ölçümler arası süre (dk)
+            <input id="minutes" type="number" min="10" max="240" step="5" value="60" />
+          </label>
+          <label>Önceki hipoglisemi?
+            <select id="postHypo">
+              <option value="no">Hayır</option>
+              <option value="yes">Evet</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="calculateBtn" class="primary">Öneriyi hesapla</button>
+      </div>
+
+      <div id="resultCard" class="card result hidden">
+        <h2>3. Öneri</h2>
+        <div class="result-grid">
+          <div><span>Hedef</span><strong id="targetOut">—</strong></div>
+          <div><span>Glukoz</span><strong id="glucoseOut">—</strong></div>
+          <div><span>Trend</span><strong id="trendOut">—</strong></div>
+        </div>
+        <div id="recommendation" class="recommendation"></div>
+        <div id="nextCheck" class="next-check"></div>
+        <div id="reasoning" class="reasoning"></div>
+      </div>
+
+      <div class="card">
+        <h2>Hipoglisemi hızlı protokol</h2>
+        <div class="hypo-box">
+          <div><strong>&lt;70 mg/dL</strong></div>
+          <div>1) IV insülini durdur</div>
+          <div>2) Yaklaşık 20 g IV glukoz: %20 dekstroz 100 mL <em>veya</em> %10 dekstroz 200 mL, 10–15 dk</div>
+          <div>3) 15 dk sonra tekrar ölç</div>
+          <div>4) Hâlâ &lt;70 ise IV glukozu tekrarla</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    YBÜ İnsülin İnfüzyon KDS • Prototip • Klinik kullanımdan önce yerel validasyon gerekir.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
